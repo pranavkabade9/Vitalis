@@ -3,6 +3,7 @@ import { useAuth } from '../lib/auth';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { ICONS } from '../constants';
 import { motion } from 'motion/react';
+import { firebaseConfigExtended } from '../lib/firebase';
 
 export default function Login() {
   const { signInWithGoogle, signInAsGuest, loading, loginError } = useAuth();
@@ -73,10 +74,22 @@ export default function Login() {
                 <motion.div 
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3 overflow-hidden"
+                  className="p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-bold flex flex-col gap-2 overflow-hidden shadow-sm"
                 >
-                  <ICONS.AlertCircle size={18} className="shrink-0" />
-                  {loginError}
+                  <div className="flex items-center gap-3">
+                    <ICONS.AlertCircle size={20} className="shrink-0" />
+                    <span>{loginError}</span>
+                  </div>
+                  {loginError.includes('Authorized Domains') && (
+                    <a 
+                      href={`https://console.firebase.google.com/project/${firebaseConfigExtended.projectId}/authentication/settings`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-8 text-xs underline hover:text-red-700 dark:hover:text-red-300 transition-colors inline-block"
+                    >
+                      Open Firebase Console →
+                    </a>
+                  )}
                 </motion.div>
               )}
 

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase, isSupabaseConfigured } from './supabase';
-import { auth, googleProvider } from './firebase';
+import { auth, googleProvider, firebaseConfigExtended } from './firebase';
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User as FirebaseUser } from 'firebase/auth';
 
 interface AuthContextType {
@@ -180,7 +180,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (error.code === 'auth/popup-blocked') {
         message = 'Popup blocked! Please allow popups for this site.';
       } else if (error.code === 'auth/unauthorized-domain') {
-        message = 'This domain is not authorized for Google Sign-In.';
+        const domain = window.location.hostname;
+        const consoleLink = `https://console.firebase.google.com/project/${firebaseConfigExtended.projectId}/authentication/settings`;
+        message = `Access Denied: Domain "${domain}" is not authorized. Please add it to your Firebase Console under Authentication > Settings > Authorized Domains.`;
+        console.warn(`Unauthorized domain. Add ${domain} here: ${consoleLink}`);
       } else if (error.message) {
         message = error.message;
       }
