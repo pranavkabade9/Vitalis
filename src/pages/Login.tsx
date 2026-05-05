@@ -5,7 +5,7 @@ import { ICONS } from '../constants';
 import { motion } from 'motion/react';
 
 export default function Login() {
-  const { signInWithGoogle, signInAsGuest, loading } = useAuth();
+  const { signInWithGoogle, signInAsGuest, loading, loginError } = useAuth();
   const [isAuthenticating, setIsAuthenticating] = React.useState(false);
 
   const handleGoogleSignIn = async () => {
@@ -69,6 +69,17 @@ export default function Login() {
             </div>
 
             <div className="space-y-4 sm:space-y-5">
+              {loginError && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  className="p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-bold flex items-center gap-3 overflow-hidden"
+                >
+                  <ICONS.AlertCircle size={18} className="shrink-0" />
+                  {loginError}
+                </motion.div>
+              )}
+
               <button 
                 onClick={handleGoogleSignIn}
                 disabled={isAuthenticating || loading}

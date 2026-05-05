@@ -7,6 +7,7 @@ interface AuthContextType {
   user: any | null;
   isGuest: boolean;
   loading: boolean;
+  loginError: string | null;
   signInWithGoogle: () => Promise<void>;
   signInAsGuest: () => void;
   signOut: () => Promise<void>;
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any | null>(null);
   const [isGuest, setIsGuest] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const [isMigrating, setIsMigrating] = useState(false);
 
   useEffect(() => {
@@ -169,15 +171,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithGoogle = async () => {
+    setLoginError(null);
     try {
       await signInWithPopup(auth, googleProvider);
     } catch (error: any) {
       console.error('Google Sign-In Error:', error);
+      let message = 'Failed to sign in with Google.';
       if (error.code === 'auth/popup-blocked') {
-        alert('Please allow popups for this site to sign in with Google.');
-      } else {
-        alert('Failed to sign in with Google. Please try again.');
+        message = 'Popup blocked! Please allow popups for this site.';
+      } else if (error.code === 'auth/unauthorized-domain') {
+        message = 'This domain is not authorized for Google Sign-In.';
+      } else if (error.message) {
+        message = error.message;
       }
+      setLoginError(message);
     }
   };
 
@@ -252,7 +259,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isGuest, loading, signInWithGoogle, signInAsGuest, signOut, updateGuestProfile, upgradeToGoogle, isMigrating }}>
+    <AuthContext.Provider value={{ user, isGuest, loading, loginError, signInWithGoogle, signInAsGuest, signOut, updateGuestProfile, upgradeToGoogle, isMigrating }}>
       {children}
     </AuthContext.Provider>
   );
