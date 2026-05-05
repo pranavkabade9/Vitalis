@@ -21,7 +21,9 @@ import {
   Download,
   Flame,
   Calendar,
-  Sun
+  Sun,
+  Check,
+  Clock as History
 } from 'lucide-react';
 
 export const ICONS = {
@@ -47,7 +49,9 @@ export const ICONS = {
   Download,
   Flame,
   Calendar,
-  Sun
+  Sun,
+  Check,
+  History
 };
 
 export const HEALTH_CATEGORIES = {

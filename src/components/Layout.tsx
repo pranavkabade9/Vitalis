@@ -119,27 +119,30 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
         </div>
         
         {/* Mobile Navigation bar */}
-        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 h-16 w-[90%] max-w-[400px] glass border border-slate-200 dark:border-slate-800 rounded-3xl flex items-center justify-around px-4 z-40 shadow-2xl">
-          {ROUTES.slice(0, 4).map(route => (
+        <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 h-16 w-[92%] glass border border-slate-200/50 dark:border-slate-800/50 rounded-[2rem] flex items-center justify-around px-2 z-40 shadow-[0_20px_50px_rgba(0,0,0,0.1)]">
+          {ROUTES.map(route => (
             <button 
               key={route.name}
               onClick={() => setActiveTab(route.name)}
               className={cn(
-                "p-3 rounded-2xl transition-all",
-                activeTab === route.name ? "text-brand-500 bg-brand-50 dark:bg-brand-500/10" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                "p-2.5 rounded-2xl transition-all relative group flex flex-col items-center",
+                activeTab === route.name ? "text-brand-500" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
               )}
             >
-              <route.icon size={24} />
+              <route.icon size={activeTab === route.name ? 24 : 20} className={cn("transition-all", activeTab === route.name && "scale-110 translate-y-[-2px]")} />
+              {activeTab === route.name && (
+                <motion.div 
+                  layoutId="activeTabDot"
+                  className="w-1 h-1 rounded-full bg-brand-500 absolute -bottom-1"
+                />
+              )}
             </button>
           ))}
           <button 
-            onClick={() => setActiveTab('Settings')}
-            className={cn(
-               "p-3 rounded-2xl transition-all",
-               activeTab === 'Settings' ? "text-brand-500 bg-brand-50 dark:bg-brand-500/10" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-            )}
+            onClick={signOut}
+            className="p-2.5 rounded-2xl text-red-500 transition-all flex flex-col items-center"
           >
-             <ICONS.Settings size={24} />
+             <ICONS.LogOut size={20} />
           </button>
         </div>
 

@@ -13,26 +13,34 @@ export default function Onboarding() {
     height: '',
     weight: '',
   });
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.full_name || !formData.age) return;
     
-    const weight = parseFloat(formData.weight) || 0;
-    
-    if (weight > 0) {
-      updateVitals({ weight });
-    }
-
-    updateGuestProfile({
-      user_metadata: { 
-        full_name: formData.full_name,
-        age: parseInt(formData.age),
-        gender: formData.gender,
-        height: parseFloat(formData.height) || 0,
-        weight: weight,
+    setSubmitting(true);
+    try {
+      const weight = parseFloat(formData.weight) || 0;
+      
+      if (weight > 0) {
+        updateVitals({ weight });
       }
-    });
+
+      await updateGuestProfile({
+        user_metadata: { 
+          full_name: formData.full_name,
+          age: parseInt(formData.age),
+          gender: formData.gender,
+          height: parseFloat(formData.height) || 0,
+          weight: weight,
+        }
+      });
+    } catch (error) {
+      console.error('Onboarding failed:', error);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (

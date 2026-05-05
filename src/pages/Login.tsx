@@ -36,9 +36,9 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col overflow-x-hidden">
-      {/* Top Section: Hero Login */}
-      <div className="min-h-screen flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-hidden shrink-0">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col lg:flex-row overflow-x-hidden">
+      {/* Left Side: Login Form */}
+      <div className="lg:w-[45%] xl:w-[40%] flex flex-col items-center justify-center p-6 sm:p-10 lg:p-16 relative overflow-hidden shrink-0 min-h-[90vh] lg:min-h-screen">
         <div className="absolute top-0 left-0 w-full h-[800px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-100/30 via-transparent to-transparent pointer-events-none" />
         
         <motion.div 
@@ -47,28 +47,28 @@ export default function Login() {
           animate="visible"
           className="max-w-md w-full relative z-10"
         >
-          <motion.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-4 mb-16">
-            <div className="w-14 h-14 rounded-[1.25rem] bg-brand-500 shadow-2xl shadow-brand-500/40 flex items-center justify-center text-white rotate-3">
-              <ICONS.Activity size={32} />
+          <motion.div variants={itemVariants} className="flex items-center justify-center lg:justify-start gap-3 sm:gap-4 mb-10 lg:mb-16">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[1.125rem] sm:rounded-[1.25rem] bg-brand-500 shadow-2xl shadow-brand-500/40 flex items-center justify-center text-white rotate-3">
+              <ICONS.Activity size={28} className="sm:w-8 sm:h-8" />
             </div>
             <div>
-              <h1 className="text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">Vitalis</h1>
-              <p className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-500 mt-1">Health Engine</p>
+              <h1 className="text-4xl sm:text-5xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">Vitalis</h1>
+              <p className="text-[9px] sm:text-[10px] uppercase font-black tracking-[0.3em] text-brand-500 mt-1">Health Engine</p>
             </div>
           </motion.div>
 
           <motion.div 
             variants={itemVariants}
-            className="bg-white dark:bg-slate-900 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-10 lg:p-12 shadow-[0_48px_80px_-16px_rgba(0,0,0,0.12)] relative overflow-hidden"
+            className="bg-white dark:bg-slate-900 rounded-[2.5rem] sm:rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 p-8 sm:p-10 lg:p-12 shadow-[0_48px_80px_-16px_rgba(0,0,0,0.12)] relative overflow-hidden"
           >
             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-brand-400 via-brand-500 to-brand-600" />
             
-            <div className="text-left mb-12">
-              <h2 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">Get Started</h2>
-              <p className="text-slate-500 mt-3 font-medium text-lg">Continue to your health workspace.</p>
+            <div className="text-left mb-8 lg:mb-12">
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-tight">Get Started</h2>
+              <p className="text-slate-500 mt-2 font-medium text-base sm:text-lg">Continue to your health workspace.</p>
             </div>
 
-            <div className="space-y-5">
+            <div className="space-y-4 sm:space-y-5">
               <button 
                 onClick={handleGoogleSignIn}
                 disabled={isAuthenticating || loading}
@@ -104,48 +104,32 @@ export default function Login() {
               No sign-up needed • Start instantly
             </p>
           </motion.div>
-
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="mt-12 flex flex-col items-center gap-4 cursor-default group"
-          >
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-brand-500 transition-colors">Discover the Vision</p>
-            <motion.div 
-              animate={{ y: [0, 8, 0] }}
-              transition={{ repeat: Infinity, duration: 2 }}
-              className="text-brand-500"
-            >
-              <ICONS.ChevronDown size={20} />
-            </motion.div>
-          </motion.div>
         </motion.div>
       </div>
 
-      {/* Bottom Section: About Detail Area */}
-      <div className="bg-[#020617] py-24 lg:py-40 px-8 lg:px-16 flex flex-col items-center relative overflow-hidden">
-        {/* Apple-style background glow */}
+      {/* Right Side: Detailed About Content */}
+      <div className="flex-1 bg-[#020617] py-20 lg:py-0 px-8 lg:px-20 flex flex-col items-center justify-start lg:h-screen lg:overflow-y-auto scroll-smooth custom-scrollbar">
+        {/* Decorative background elements */}
         <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-brand-600/10 blur-[180px] rounded-full -mr-96 -mt-96 animate-pulse" />
         <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-emerald-600/5 blur-[140px] rounded-full -ml-40 -mb-40" />
-
+        
         <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-4xl w-full relative z-10 mx-auto"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8 }}
+          className="max-w-4xl w-full relative z-10 mx-auto py-24 sm:py-32"
         >
-          <div className="text-center mb-24">
+          {/* 1. HERO SECTION */}
+          <div className="text-center mb-40">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 mb-6"
+              className="inline-flex items-center gap-2 mb-8"
             >
-              <div className="w-1.5 h-1.5 rounded-full bg-brand-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-brand-400">The Blueprint</span>
+              <div className="w-2 h-2 rounded-full bg-brand-500 animate-pulse" />
+              <span className="text-[11px] font-black uppercase tracking-[0.5em] text-brand-400">The Vision</span>
             </motion.div>
 
             <motion.h2 
@@ -153,9 +137,10 @@ export default function Login() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3, duration: 0.7 }}
-              className="text-6xl lg:text-9xl font-black text-white tracking-tighter leading-[0.8] mb-12"
+              className="text-6xl lg:text-8xl font-black text-white tracking-tighter leading-[0.85] mb-12"
             >
-              ZERO SETUP <br /> REQUIRED
+              YOUR SMART <br />
+              <span className="bg-gradient-to-r from-brand-400 via-indigo-400 to-emerald-400 bg-clip-text text-transparent italic">HEALTH COMPANION</span>
             </motion.h2>
 
             <motion.p 
@@ -163,67 +148,154 @@ export default function Login() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.4, duration: 0.7 }}
-              className="text-slate-400 text-xl lg:text-2xl font-medium leading-relaxed max-w-2xl mx-auto"
+              className="text-slate-400 text-xl lg:text-2xl font-medium leading-relaxed max-w-3xl mx-auto"
             >
-              Start your journey instantly. No login or complicated setup required to begin—just use Guest Mode and upgrade later to sync across devices.
+              A structured, rule-based health monitoring system designed to help you track, understand, and improve your daily health with clarity and consistency.
             </motion.p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+          {/* 2. WHAT THIS APP DOES & WHY DIFFERENT */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-48">
             <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.5, duration: 0.8 }}
-              className="p-10 lg:p-14 rounded-[3.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all"
+              className="p-10 lg:p-12 rounded-[3.5rem] bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all group"
             >
-              <h3 className="text-3xl font-black text-white mb-10 tracking-tight">Why Vitalis?</h3>
-              <div className="space-y-10">
-                <FeatureRow icon={<ICONS.ShieldAlert size={18} />} title="STAY PRIVATE" description="Your health data remains local and secure." delay={0.6} />
-                <FeatureRow icon={<ICONS.Activity size={18} />} title="AVOID UNCERTAINTY" description="Rule-based monitoring for clear medical insights." delay={0.7} />
-                <FeatureRow icon={<ICONS.TrendingUp size={18} />} title="BUILD CONSISTENCY" description="Daily tracking leads to long-term wellness." delay={0.8} />
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-brand-500/10 flex items-center justify-center text-brand-400">
+                  <ICONS.Activity size={24} />
+                </div>
+                <h3 className="text-2xl font-black text-white">What it does</h3>
+              </div>
+              <p className="text-slate-400 text-lg font-medium leading-relaxed mb-8">
+                Monitor key metrics like heart rate, blood pressure, sleep, and hydration. Compare inputs with medically defined ranges and get meaningful feedback <span className="text-white font-bold italic">without relying on unpredictable AI.</span>
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400">Transparency</span>
+                <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest text-slate-400">Precision</span>
               </div>
             </motion.div>
 
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="p-10 lg:p-12 rounded-[3.5rem] bg-gradient-to-br from-indigo-600/20 to-brand-600/20 border border-white/10 hover:border-brand-500/30 transition-all group"
+            >
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-12 h-12 rounded-2xl bg-brand-500/20 flex items-center justify-center text-brand-400">
+                  <ICONS.ShieldAlert size={24} />
+                </div>
+                <h3 className="text-2xl font-black text-white">Why it's different</h3>
+              </div>
+              <ul className="space-y-4">
+                {[
+                  "No AI dependency → Predictable logic",
+                  "Rule-based system → Consistent results",
+                  "Minimalist UI → Zero clutter",
+                  "User-focused → Built for clarity"
+                ].map((item, i) => (
+                  <li key={i} className="flex items-center gap-3 text-slate-300 font-medium text-lg">
+                    <div className="w-1.5 h-1.5 rounded-full bg-brand-500" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </motion.div>
+          </div>
+
+          {/* 3. HOW IT WORKS (STEP FLOW) */}
+          <div className="mb-48 px-4 lg:px-0">
+            <div className="text-center mb-32">
+              <h3 className="text-4xl lg:text-5xl font-black text-white tracking-tight mb-6 uppercase italic">How it works</h3>
+              <p className="text-slate-500 font-medium text-lg">Simple 4-step precision monitoring</p>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-24">
+              {[
+                { step: "01", title: "INPUT DATA", desc: "Enter vitals, sleep, water, and activity." },
+                { step: "02", title: "EVALUATE", desc: "System compares data with medical thresholds." },
+                { step: "03", title: "FEEDBACK", desc: "Receive instant alerts and status updates." },
+                { step: "04", title: "TRACK", desc: "Analyze progress over time via visual logs." }
+              ].map((item, i) => (
+                <motion.div 
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="relative group"
+                >
+                  <div className="text-[100px] lg:text-[120px] font-black text-white/[0.03] absolute -top-16 lg:-top-24 -left-2 lg:-left-8 pointer-events-none group-hover:text-brand-500/[0.06] transition-colors leading-none tracking-tighter">
+                    {item.step}
+                  </div>
+                  <div className="relative pt-6 lg:pt-10 z-10">
+                    <h4 className="text-[12px] font-black text-brand-400 uppercase tracking-[0.3em] mb-4">{item.title}</h4>
+                    <p className="text-slate-400 font-medium leading-relaxed text-sm lg:text-base">{item.desc}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          {/* 4. KEY FEATURES (GRID) */}
+          <div className="mb-48">
+            <h3 className="text-5xl font-black text-white mb-20 tracking-tight text-center uppercase">THE ENGINE CORE</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+              <AboutItem icon={<ICONS.Activity size={20} />} title="Vital Monitoring" description="Track heart rate, blood pressure, and weight with medical precision." delay={0.1} />
+              <AboutItem icon={<ICONS.Moon size={20} />} title="Lifestyle Insights" description="Sleep cycles, water intake, and movement patterns monitored daily." delay={0.2} />
+              <AboutItem icon={<ICONS.Pill size={20} />} title="Medication Tracker" description="Add doses, set reminders, and maintain consistency easily." delay={0.3} />
+              <AboutItem icon={<ICONS.ShieldAlert size={20} />} title="Smart Alerts" description="Get notified instantly when metrics fall outside safe thresholds." delay={0.4} />
+              <AboutItem icon={<ICONS.TrendingUp size={20} />} title="Health Score" description="Understand your daily state with a single, clear health indicator." delay={0.5} />
+              <AboutItem icon={<ICONS.History size={20} />} title="Trends & Logs" description="Review your journey through interactive charts and historical logs." delay={0.6} />
+            </div>
+          </div>
+
+          {/* 5. PRIVACY & FOR WHO */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 lg:gap-20 mb-32 items-start">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+            >
+              <h3 className="text-4xl font-black text-white mb-6 uppercase tracking-tighter">Your data is yours</h3>
+              <p className="text-slate-400 text-xl font-medium leading-relaxed">
+                We believe health data should be private. All information is completely isolated per user. Guest data is assigned unique tokens to ensure zero cross-over. Your privacy is pre-built into the logic.
+              </p>
+            </motion.div>
             <motion.div 
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.8, duration: 0.8 }}
-              className="p-10 lg:p-14 rounded-[3.5rem] bg-gradient-to-br from-brand-600 to-indigo-700 shadow-2xl shadow-brand-500/20 relative overflow-hidden group"
+              className="p-10 rounded-[3rem] bg-white/[0.03] border border-white/5 space-y-8"
             >
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000" />
-              <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center text-white mb-12">
-                <ICONS.Activity size={32} />
-              </div>
-              <h3 className="text-4xl font-black text-white mb-6 tracking-tighter leading-[0.9]">Simple & <br />Accessible</h3>
-              <p className="text-white/80 text-xl font-medium leading-relaxed mb-12">
-                A clean, easy-to-use interface that adapts to your life. Your data is always with you.
-              </p>
-              <div className="flex gap-4">
-                <span className="px-6 py-2 rounded-2xl bg-white/10 text-white text-[11px] font-black uppercase tracking-widest border border-white/10">Responsive</span>
-                <span className="px-6 py-2 rounded-2xl bg-white/10 text-white text-[11px] font-black uppercase tracking-widest border border-white/10">Clean UI</span>
+              <h4 className="text-white font-bold opacity-50 uppercase tracking-widest text-[10px]">Optimized For</h4>
+              <div className="space-y-6">
+                {[
+                  "Individuals tracking daily health",
+                  "Habit-driven professionals",
+                  "Users who value logic over AI noise"
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+                      <ICONS.Check size={16} />
+                    </div>
+                    <span className="text-slate-300 font-bold">{item}</span>
+                  </div>
+                ))}
               </div>
             </motion.div>
           </div>
 
-          <motion.div 
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: 1, duration: 1 }}
-            className="mt-24 pt-10 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-6"
-          >
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-brand-500 flex items-center justify-center text-white">
-                <ICONS.Activity size={16} />
-              </div>
-              <span className="text-lg font-black text-white tracking-widest uppercase">Vitalis</span>
+          <div className="pt-12 flex items-center justify-between border-t border-white/5">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-700">© 2026 Vitalis Health Engine</p>
+            <div className="flex gap-1.5">
+              <div className="w-1 h-1 rounded-full bg-slate-800" />
+              <div className="w-1 h-1 rounded-full bg-slate-800" />
+              <div className="w-1 h-1 rounded-full bg-slate-800" />
             </div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">
-              © 2026 Vitalis • Precision Health Logic
-            </p>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </div>
