@@ -19,10 +19,14 @@
 @layer base {
   :root {
     color-scheme: light;
+    --tooltip-bg: rgba(255, 255, 255, 0.95);
+    --tooltip-color: #1e293b;
   }
   
   .dark {
     color-scheme: dark;
+    --tooltip-bg: rgba(15, 23, 42, 0.95);
+    --tooltip-color: #f1f5f9;
   }
 
   body {

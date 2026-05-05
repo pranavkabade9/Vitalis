@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Layout from './components/Layout';
 import { ThemeProvider } from './components/ThemeProvider';
 import { AuthProvider, useAuth } from './lib/auth';
-import { HealthProvider } from './lib/store';
+import { HealthProvider, useHealth } from './lib/store';
 import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
@@ -14,10 +14,11 @@ import Settings from './pages/Settings';
 import { AnimatePresence, motion } from 'motion/react';
 
 function AppContent() {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const { profile, loading: healthLoading } = useHealth();
   const [activeTab, setActiveTab] = useState('Dashboard');
 
-  if (loading) {
+  if (authLoading || healthLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <motion.div 
@@ -35,7 +36,14 @@ function AppContent() {
     return <Login />;
   }
 
-  if (user.is_guest && !user.onboarded) {
+  // Check if onboarding is needed
+  const isProfileIncomplete = !profile.profileCompleted;
+  const hasSkippedOnboarding = sessionStorage.getItem('vitalis-onboarding-skipped') === 'true';
+
+  // For Google users, we allow skip. For Guest users, we don't (required mini setup).
+  const showOnboarding = isProfileIncomplete && (user.is_guest || !hasSkippedOnboarding);
+
+  if (showOnboarding) {
     return <Onboarding />;
   }
 

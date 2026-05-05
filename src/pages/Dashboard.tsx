@@ -27,13 +27,24 @@ const MOCK_HISTORICAL_DATA = [
 ];
 
 export default function Dashboard() {
-  const { vitals, lifestyle, medications, toggleMedication, healthScore } = useHealth();
+  const { vitals, lifestyle, medications, toggleMedication, healthScore, profile } = useHealth();
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
+  const [showReminder, setShowReminder] = useState(!user?.is_guest && !profile.profileCompleted && !sessionStorage.getItem('vitalis-reminder-dismissed'));
 
   useEffect(() => {
     setTimeout(() => setLoading(false), 800);
   }, []);
+
+  const handleCompleteNow = () => {
+    sessionStorage.removeItem('vitalis-onboarding-skipped');
+    window.location.reload();
+  };
+
+  const handleDismissReminder = () => {
+    setShowReminder(false);
+    sessionStorage.setItem('vitalis-reminder-dismissed', 'true');
+  };
 
   const handleExport = () => {
     generateHealthReport(
@@ -75,6 +86,39 @@ export default function Dashboard() {
           Export PDF Report
         </button>
       </div>
+
+      {showReminder && (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-brand-500/10 border border-brand-500/20 p-4 sm:p-5 rounded-[2rem] flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm"
+        >
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-brand-500 text-white flex items-center justify-center shadow-lg shadow-brand-500/20">
+              <ICONS.User size={22} />
+            </div>
+            <div className="text-center sm:text-left">
+              <h4 className="text-sm font-bold text-slate-800 dark:text-white">Complete Your Health Profile</h4>
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-medium">Add your medical details to get more accurate insights and personalized feedback.</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button 
+              onClick={handleCompleteNow}
+              className="flex-1 sm:flex-none px-6 py-2.5 bg-brand-500 text-white text-[11px] font-black uppercase tracking-widest rounded-xl hover:scale-105 active:scale-95 transition-all"
+            >
+              Complete Now
+            </button>
+            <button 
+              onClick={handleDismissReminder}
+              className="p-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+              title="Dismiss"
+            >
+              <ICONS.X size={18} />
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Top Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -125,8 +169,10 @@ export default function Dashboard() {
                   borderRadius: '12px', 
                   border: 'none', 
                   boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)'
+                  backgroundColor: 'var(--tooltip-bg, rgba(255, 255, 255, 0.9))',
+                  color: 'var(--tooltip-color, #1e293b)'
                 }} 
+                itemStyle={{ color: 'inherit' }}
               />
               <Area type="monotone" dataKey="score" stroke="#22c55e" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
             </AreaChart>

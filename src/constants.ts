@@ -23,6 +23,11 @@ import {
   Calendar,
   Sun,
   Check,
+  X,
+  Phone,
+  MapPin,
+  Copy,
+  Share2,
   Clock as History
 } from 'lucide-react';
 
@@ -51,6 +56,11 @@ export const ICONS = {
   Calendar,
   Sun,
   Check,
+  X,
+  Phone,
+  MapPin,
+  Copy,
+  Share2,
   History
 };
 

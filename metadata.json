@@ -1,6 +1,6 @@
 {
   "name": "Vitalis",
   "description": "A premium SaaS-style health monitoring dashboard with rule-based alerting and health scoring.",
-  "requestFramePermissions": [],
+  "requestFramePermissions": ["geolocation"],
   "majorCapabilities": []
 }

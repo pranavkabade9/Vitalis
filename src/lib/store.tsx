@@ -25,12 +25,36 @@ export interface Medication {
   takenToday: boolean;
 }
 
+export interface EmergencyContact {
+  id: string;
+  name: string;
+  phone: string;
+  isPrimary: boolean;
+}
+
+export interface ProfileData {
+  bloodGroup: string;
+  medicalConditions: string;
+  age?: number;
+  gender?: string;
+  height?: number;
+  weight?: number;
+  allergies?: string;
+  medicationsInfo?: string;
+  profileCompleted: boolean;
+}
+
 interface HealthContextType {
   vitals: VitalLog;
   lifestyle: LifestyleLog;
   medications: Medication[];
+  profile: ProfileData;
+  emergencyContacts: EmergencyContact[];
+  loading: boolean;
   updateVitals: (vitals: Partial<VitalLog>) => void;
   updateLifestyle: (lifestyle: Partial<LifestyleLog>) => void;
+  updateProfile: (profile: Partial<ProfileData>) => void;
+  updateEmergencyContacts: (contacts: EmergencyContact[]) => void;
   toggleMedication: (id: string) => void;
   addMedication: (med: Omit<Medication, 'id' | 'takenToday'>) => void;
   removeMedication: (id: string) => void;
@@ -52,6 +76,14 @@ const DEFAULT_LIFESTYLE: LifestyleLog = {
   timestamp: new Date().toISOString(),
 };
 
+const DEFAULT_PROFILE: ProfileData = {
+  bloodGroup: 'Not provided',
+  medicalConditions: 'Not provided',
+  allergies: 'None',
+  medicationsInfo: 'None',
+  profileCompleted: false
+};
+
 const HealthContext = createContext<HealthContextType | undefined>(undefined);
 
 export function HealthProvider({ children }: { children: React.ReactNode }) {
@@ -59,10 +91,14 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
   const [vitals, setVitalsState] = useState<VitalLog>(DEFAULT_VITALS);
   const [lifestyle, setLifestyleState] = useState<LifestyleLog>(DEFAULT_LIFESTYLE);
   const [medications, setMedications] = useState<Medication[]>([]);
+  const [profile, setProfile] = useState<ProfileData>(DEFAULT_PROFILE);
+  const [emergencyContacts, setEmergencyContacts] = useState<EmergencyContact[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Load data
   useEffect(() => {
     const loadData = async () => {
+      setLoading(true);
       if (isSupabaseConfigured && !isGuest && user) {
         // Load from Supabase
         try {
@@ -108,9 +144,46 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
               name: m.name,
               dosage: m.dosage,
               frequency: m.frequency,
-              takenToday: false // Logic for takenToday would need medication_logs table joins
+              takenToday: false
             })));
           }
+
+          // Load profile extra info from users table
+          const { data: userData } = await supabase
+            .from('users')
+            .select('blood_group, medical_conditions, age, gender, height, weight, allergies, medications_info, profile_completed')
+            .eq('id', user.id)
+            .single();
+
+          if (userData) {
+            setProfile({
+              bloodGroup: userData.blood_group || 'Not provided',
+              medicalConditions: userData.medical_conditions || 'Not provided',
+              age: userData.age,
+              gender: userData.gender,
+              height: userData.height,
+              weight: userData.weight,
+              allergies: userData.allergies || 'None',
+              medicationsInfo: userData.medications_info || 'None',
+              profileCompleted: userData.profile_completed || false
+            });
+          }
+
+          // Load emergency contacts
+          const { data: contactsData } = await supabase
+            .from('emergency_contacts')
+            .select('*')
+            .eq('user_id', user.id);
+
+          if (contactsData) {
+            setEmergencyContacts(contactsData.map((c: any) => ({
+              id: c.id,
+              name: c.name,
+              phone: c.phone,
+              isPrimary: c.is_primary
+            })));
+          }
+
         } catch (error) {
           console.error('Error loading data from Supabase:', error);
         }
@@ -119,11 +192,16 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
         const savedVitals = localStorage.getItem('vitalis-vitals');
         const savedLifestyle = localStorage.getItem('vitalis-lifestyle');
         const savedMeds = localStorage.getItem('vitalis-meds');
+        const savedProfile = localStorage.getItem('vitalis-profile');
+        const savedContacts = localStorage.getItem('vitalis-contacts');
 
         if (savedVitals) setVitalsState(JSON.parse(savedVitals));
         if (savedLifestyle) setLifestyleState(JSON.parse(savedLifestyle));
         if (savedMeds) setMedications(JSON.parse(savedMeds));
+        if (savedProfile) setProfile(JSON.parse(savedProfile));
+        if (savedContacts) setEmergencyContacts(JSON.parse(savedContacts));
       }
+      setLoading(false);
     };
 
     loadData();
@@ -148,19 +226,35 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [medications, isGuest]);
 
+  useEffect(() => {
+    if (isGuest || !isSupabaseConfigured) {
+      localStorage.setItem('vitalis-profile', JSON.stringify(profile));
+    }
+  }, [profile, isGuest]);
+
+  useEffect(() => {
+    if (isGuest || !isSupabaseConfigured) {
+      localStorage.setItem('vitalis-contacts', JSON.stringify(emergencyContacts));
+    }
+  }, [emergencyContacts, isGuest]);
+
   const updateVitals = async (newVitals: Partial<VitalLog>) => {
     const updated = { ...vitals, ...newVitals, timestamp: new Date().toISOString() };
     setVitalsState(updated);
 
     if (isSupabaseConfigured && !isGuest && user) {
-      await supabase.from('vitals').insert({
-        user_id: user.id,
-        heart_rate: updated.heart_rate,
-        systolic_bp: updated.blood_pressure_sys,
-        diastolic_bp: updated.blood_pressure_dia,
-        weight_kg: updated.weight,
-        logged_at: updated.timestamp
-      });
+      try {
+        await supabase.from('vitals').insert({
+          user_id: user.id,
+          heart_rate: updated.heart_rate,
+          systolic_bp: updated.blood_pressure_sys,
+          diastolic_bp: updated.blood_pressure_dia,
+          weight_kg: updated.weight,
+          logged_at: updated.timestamp
+        });
+      } catch (e) {
+        console.error('Error updating vitals:', e);
+      }
     }
   };
 
@@ -169,13 +263,63 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
     setLifestyleState(updated);
 
     if (isSupabaseConfigured && !isGuest && user) {
-      await supabase.from('lifestyle_logs').insert({
-        user_id: user.id,
-        sleep_hours: updated.sleep_hours,
-        water_intake_ml: updated.water_ml,
-        steps: updated.steps,
-        logged_at: updated.timestamp
-      });
+      try {
+        await supabase.from('lifestyle_logs').insert({
+          user_id: user.id,
+          sleep_hours: updated.sleep_hours,
+          water_intake_ml: updated.water_ml,
+          steps: updated.steps,
+          logged_at: updated.timestamp
+        });
+      } catch (e) {
+        console.error('Error updating lifestyle:', e);
+      }
+    }
+  };
+
+  const updateProfile = async (newProfile: Partial<ProfileData>) => {
+    const updated = { ...profile, ...newProfile };
+    setProfile(updated);
+
+    if (isSupabaseConfigured && !isGuest && user) {
+      try {
+        await supabase.from('users').update({
+          blood_group: updated.bloodGroup,
+          medical_conditions: updated.medicalConditions,
+          age: updated.age,
+          gender: updated.gender,
+          height: updated.height,
+          weight: updated.weight,
+          allergies: updated.allergies,
+          medications_info: updated.medicationsInfo,
+          profile_completed: updated.profileCompleted
+        }).eq('id', user.id);
+      } catch (e) {
+        console.error('Error updating profile:', e);
+      }
+    }
+  };
+
+  const updateEmergencyContacts = async (contacts: EmergencyContact[]) => {
+    setEmergencyContacts(contacts);
+
+    if (isSupabaseConfigured && !isGuest && user) {
+      try {
+        // Simplified: delete all and re-insert
+        await supabase.from('emergency_contacts').delete().eq('user_id', user.id);
+        if (contacts.length > 0) {
+          await supabase.from('emergency_contacts').insert(
+            contacts.map(c => ({
+              user_id: user.id,
+              name: c.name,
+              phone: c.phone,
+              is_primary: c.isPrimary
+            }))
+          );
+        }
+      } catch (e) {
+        console.error('Error updating contacts:', e);
+      }
     }
   };
 
@@ -183,17 +327,41 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
     setMedications(prev => prev.map(m => m.id === id ? { ...m, takenToday: !m.takenToday } : m));
   };
 
-  const addMedication = (med: Omit<Medication, 'id' | 'takenToday'>) => {
+  const addMedication = async (med: Omit<Medication, 'id' | 'takenToday'>) => {
+    const newId = Math.random().toString(36).substr(2, 9);
     const newMed: Medication = {
       ...med,
-      id: Math.random().toString(36).substr(2, 9),
+      id: newId,
       takenToday: false,
     };
     setMedications(prev => [...prev, newMed]);
+
+    if (isSupabaseConfigured && !isGuest && user) {
+      try {
+        await supabase.from('medications').insert({
+          id: newId,
+          user_id: user.id,
+          name: med.name,
+          dosage: med.dosage,
+          frequency: med.frequency,
+          active: true
+        });
+      } catch (e) {
+        console.error('Error adding meditation:', e);
+      }
+    }
   };
 
-  const removeMedication = (id: string) => {
+  const removeMedication = async (id: string) => {
     setMedications(prev => prev.filter(m => m.id !== id));
+
+    if (isSupabaseConfigured && !isGuest && user) {
+      try {
+        await supabase.from('medications').update({ active: false }).eq('id', id);
+      } catch (e) {
+        console.error('Error removing medication:', e);
+      }
+    }
   };
 
   const calculateHealthScore = () => {
@@ -226,8 +394,13 @@ export function HealthProvider({ children }: { children: React.ReactNode }) {
       vitals, 
       lifestyle, 
       medications, 
+      profile,
+      emergencyContacts,
+      loading,
       updateVitals, 
       updateLifestyle, 
+      updateProfile,
+      updateEmergencyContacts,
       toggleMedication,
       addMedication,
       removeMedication,

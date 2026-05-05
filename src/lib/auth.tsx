@@ -25,7 +25,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      setLoading(true);
       if (firebaseUser) {
+        let dbUser = null;
         // Sync with Supabase Users table
         if (isSupabaseConfigured) {
           try {
@@ -36,12 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               .single();
 
             if (!existingUser) {
-              await supabase.from('users').insert({
+              const { data: newUser } = await supabase.from('users').insert({
                 id: firebaseUser.uid,
                 email: firebaseUser.email,
                 full_name: firebaseUser.displayName,
-                created_at: new Date().toISOString()
-              });
+                created_at: new Date().toISOString(),
+                is_guest: false
+              }).select().single();
+              dbUser = newUser;
+            } else {
+              dbUser = existingUser;
             }
           } catch (error) {
             console.error('Error syncing user with Supabase:', error);
@@ -53,7 +59,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           email: firebaseUser.email,
           user_metadata: {
             full_name: firebaseUser.displayName,
-            avatar_url: firebaseUser.photoURL
+            avatar_url: firebaseUser.photoURL,
+            age: dbUser?.age,
+            gender: dbUser?.gender
           },
           is_guest: false
         });
@@ -61,9 +69,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         handleMigrationIfNeeded(firebaseUser.uid);
         localStorage.removeItem('vitalis-guest-session');
       } else {
-        // We do not auto-restore guest sessions on mount as per user request to land on login page
-        setUser(null);
-        setIsGuest(false);
+        const guestData = localStorage.getItem('vitalis-guest-session');
+        if (guestData) {
+          setUser(JSON.parse(guestData));
+          setIsGuest(true);
+        } else {
+          setUser(null);
+          setIsGuest(false);
+        }
       }
       setLoading(false);
     });

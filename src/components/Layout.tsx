@@ -5,6 +5,7 @@ import { useTheme } from './ThemeProvider';
 import { motion } from 'motion/react';
 import { useAuth } from '../lib/auth';
 import Clock from './Clock';
+import SOSSystem from './SOSSystem';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,9 +17,12 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
   const { theme, setTheme } = useTheme();
   const { user, signOut } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSOSOpen, setIsSOSOpen] = useState(false);
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
+      <SOSSystem isOpen={isSOSOpen} onClose={() => setIsSOSOpen(false)} />
+      
       {/* Sidebar - Desktop */}
       <motion.aside
         initial={false}
@@ -53,16 +57,6 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
         </nav>
 
         <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className={cn(
-               "flex items-center gap-3 w-full p-3 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all",
-               !isSidebarOpen && "justify-center"
-            )}
-          >
-            {theme === 'dark' ? <ICONS.Sun size={22} className="shrink-0" /> : <ICONS.Moon size={22} className="shrink-0" />}
-            {isSidebarOpen && <span className="font-medium whitespace-nowrap">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>}
-          </button>
           <button 
             onClick={signOut}
             className={cn(
@@ -102,13 +96,16 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
               <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-white dark:ring-slate-900"></span>
             </button>
             
-            <div className="flex items-center gap-3 pl-3 md:pl-4 border-l border-slate-200 dark:border-slate-800">
+            <div 
+              onClick={() => setActiveTab('Settings')}
+              className="flex items-center gap-3 pl-3 md:pl-4 border-l border-slate-200 dark:border-slate-800 cursor-pointer group"
+            >
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight">{user?.user_metadata?.full_name || 'Anonymous'}</p>
+                <p className="text-sm font-bold text-slate-800 dark:text-white leading-tight group-hover:text-brand-500 transition-colors">{user?.user_metadata?.full_name || 'Anonymous'}</p>
                 <p className="text-[10px] font-bold text-brand-500 uppercase tracking-widest">{user?.is_guest ? 'Guest Session' : 'Verified Member'}</p>
               </div>
-              <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-brand-500 shrink-0">
-                <ICONS.User size={24} className="text-slate-400" />
+              <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-brand-500 group-hover:border-brand-600 transition-all shrink-0 shadow-sm shadow-brand-500/10">
+                <ICONS.User size={24} className="text-slate-400 group-hover:text-brand-500 transition-colors" />
               </div>
             </div>
           </div>
@@ -151,7 +148,7 @@ export default function Layout({ children, activeTab, setActiveTab }: LayoutProp
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           className="fixed bottom-24 md:bottom-8 right-4 md:right-8 z-30 w-14 h-14 md:w-16 md:h-16 rounded-full bg-red-600 text-white shadow-2xl shadow-red-600/40 flex items-center justify-center group"
-          onClick={() => alert("SOS Triggered! Notifying emergency contacts and displaying medical info.")}
+          onClick={() => setIsSOSOpen(true)}
         >
           <ICONS.ShieldAlert size={28} className="md:w-8 md:h-8" />
           <span className="absolute right-20 bg-red-600 text-white px-3 py-1 rounded-lg text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none hidden md:block">
